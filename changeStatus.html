@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html id="con">
+<head lang="en">
+    <meta name=”renderer” content=”webkit” />
+    <meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+    <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"  />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="js/transcoding.js"></script>
+    <title>物品领用</title>
+    <style>
+        .content{margin:0;}
+    </style>
+    <script>
+        function getUserInfo(s1,s2,s3,s4,s5,s6,s7,s8){
+            ajaxData.userid = s7;
+            ajaxData.sid = s8;
+            ajaxData.roleid = s3;
+            getData(getBasic,'GET',ajaxData,['name','classname','deptname'],basicObj);
+            basicObj.status = statusObj;
+        }
+    </script>
+</head>
+<body>
+    <div class="bg_layout" transition="bg-layout" v-show="aL.bgLayout" v-on:click="aL.bgLayout=false,aL.popup=false" v-cloak></div>
+    <div class="popup" transition="popup" v-show="aL.popup">
+        <div class="popup_tit">选择</div>
+        <ul class="popup_con">
+            <li v-for="i in popup.data" v-on:click="setVal($event)" data-id="{{ i.basicdataid || i.equipmentid || i.servicemanid || i.classid || i.deptid || i.id}}" v-if="i.equipmentid ? i.equipmenttypeid == popup.eqTypeid : true">{{ i.name || i.classname || i.deptname}}</li>
+        </ul>
+        <div class="popup_exit" v-on:click="aL.bgLayout=false,aL.popup=false"> 取消 </div>
+    </div>
+    <!--popup-->
+
+    <div class="layout">
+        <div class="loader">
+            <div class="loader-inner ball-spin-fade-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <!--loader-->
+
+    <div class="all" style="overflow:auto;">
+        <div class="header">
+            <div class="info_box clearfix">
+                <img src="img/logo.png"/>
+                <div>
+                    <p><b>{{ data.data.approveman }}</b> <span class="color_red">{{ data.data.status }}</span></p>
+                    <p>三年一班</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content" data-status="{{ data.data.applyforid }}">
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">申请物品 ：</span>
+                    <p class="item_r">{{ data.data.equipmentname }}</p>
+                </div>
+                <div class="item">
+                    <span class="item_l">其它物品 ：</span>
+                    <p class="item_r"></p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">库存总数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.itemtotalnumber == 'null' ? ‘未知’: data.data.itemtotalnumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">库存已借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.borrowoutnumber == 'null' ? ‘未知’: data.data.borrowoutnumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">库存可借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.availablenumber == 'null' ? ‘未知’: data.data.availablenumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.equipmentnum }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请原因 ：</span>
+                    <p class="item_r">{{ data.data.applyforreason }}</p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">申请日期 ：</span>
+                    <p class="item_r">{{ data.data.gettime }}</p>
+                </div>
+                <div class="item">
+                    <span class="item_l">归还日期 ：</span>
+                    <p class="item_r">{{ data.data.returntime }}</p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+
+                <!--<div class="item" v-if="hasPer('CKSYWPSQ')"> &lt;!&ndash; v-if="hasPer('SZWPGLY')" &ndash;&gt;-->
+                    <!--<span class="item_l">申请状态</span>-->
+                    <!--<input class="item_r" type="text" readonly="" value="{{ data.data.status }}" v-on:click="popupFunc('status',$event)" id="status" data-id="{{ data.data.statuId }}" />-->
+                    <!--&lt;!&ndash;<input class="item_r" type="text" readonly="" value="{{ data.data.serviceman }}" v-on:click="popupFunc('servicemandata',$event)" id="serviceMan" data-id="{{ data.data.servicemanid }}"/>&ndash;&gt;-->
+                <!--</div>-->
+
+
+                <div class="item">
+                    <span class="item_l">是否存在库存</span>
+                    <div class="item_r radio_box">
+                        <div class="radio" v-bind:class="data.data.availablenumber > 0 ? 'on' : ''">
+                            <span><a></a></span>
+                            <p>是</p>
+                        </div>
+                        <div class="radio" v-bind:class="data.data.availablenumber <= 0 ? 'on' : ''">
+                            <span><a></a></span>
+                            <p>否</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <span class="item_l">采办人</span>
+                    <input class="item_r" type="text" readonly="" value="{{ data.data.serviceman }}" v-on:click="popupFunc('servicemandata',$event)" id="serviceMan" data-id="{{ data.data.servicemanid }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">批注 ：</span>
+                    <p class="item_r">{{ data.data.comment }}</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="cancel"  onclick="" v-if="hasPer('WPQX') && !hasPer('CKSYWPSQ')">取消申请</div>-->
+        <!--<div class="btn" style="float:left;margin-left:1%;margin-right:3%;" id="affirm" v-if="hasPer('CKSYWPSQ')">确定更改状态</div>&lt;!&ndash;v-if="hasPer('WPXG')"&ndash;&gt; &lt;!&ndash; v-if="hasPer('CKSYWPSQ')" &ndash;&gt;-->
+        <div class="btn" data-status="{{parent.changeStatus | changeStatus}}" id="changeOnce" v-if=" parent.pageIndex != 5 && hasPer('WPYJC') && !hasPer('CKSYWPSQ')" >{{ parent.pageIndex | btnName }}</div>
+
+    </div>
+</body>
+<script type="text/javascript" src="./js/main.js"></script>
+<script>
+    $(function(){
+        var url = location.href;
+        var transData = ['repairman','faultdescription','serviceman','approveman','comment','specifiedserviceman','faultname','otherequipment'];
+        var urlData = {data:'',number:''},
+             popupData = {data:'',name:'',_thisNode:'',eqTypeid:'',isExist:''},
+             basicTrans = ['name','classname','deptname'],
+             aL = {bgLayout:false,popup:false};
+        url = url.split('?')[1];
+        url = decodeURI(url);
+        urlData.data = JSON.parse(url);
+//        alert(JSON.stringify(urlData));
+
+        //get param from parent page
+        parentParam = parent.giveParam();
+        //
+
+        new Vue({
+            el:"#con",
+            data:{
+                data:urlData,
+                popup:popupData,
+                basic:basicObj,
+                aL:aL,
+                parent:parentParam
+            },
+            methods:{
+                popupFunc: function(type,event){
+                    var _thisNode = event.currentTarget;
+                    if(type == 'equipmentdata'){
+                        this.popup.eqTypeid = $('#eqType').attr('data-id');
+                    }
+//                    alert($('#eqType').attr('data-id'));
+                    this.popup.data = this.basic[type];
+                    this.popup._thisNode = _thisNode;
+//                    alert(JSON.stringify(this.popup));
+                },
+                setVal: function(event){
+                    var text = $(event.currentTarget).text() , id = $(event.currentTarget).attr('data-id');
+                    if($(this.popup._thisNode).attr('id') == 'eqType'){
+                        $('#eq').val('');
+                        $('#eq').removeAttr('data-id');
+                    }else if($(this.popup._thisNode).attr('id') == 'eq'){
+                        var Info = Ajax(isExist,'GET',{equipmentid:id}) , itemTotalNumber = JSON.parse(Info.responseText).itemTotalNumber;
+                        itemTotalNumber > 0 ? this.popup.isExist = '1' : this.popup.isExist = '0';
+                    }
+                    $(this.popup._thisNode).val(text);
+                    $(this.popup._thisNode).attr('data-id',id);
+                    this.aL.bgLayout = false;
+                    this.aL.popup = false;
+                },
+                hasPer: function(per){
+                    if(!window.GreenSchool){
+                        permission = parentParam.permission.split(',');
+                    }
+                    return isInArr(per,permission);
+                }
+            },
+            filters:{
+                btnName:function(value){
+                    var res;
+                    switch(value){
+                        case 1:
+                            res = '可领取';
+                            break;
+                        case 2:
+                            res = '已借出';
+                            break;
+                        case 3:
+                            res = '待归还';
+                            break;
+                        case 4:
+                            res = '已归还';
+                            break;
+                        case 5:
+                            res = '';
+                            break;
+                        case 6:
+                            res = '撤销取消';
+                            break;
+                        case 7:
+                            res = '撤销驳回';
+                            break;
+                    }
+                    return res
+                },
+                changeStatus:function(value){
+                    value == 8 || value == 9 ? value = 2 : '';
+                    return value;
+                }
+
+            }
+        });
+
+        if(window.GreenSchool){
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+            basicObj.status = statusObj;
+        }else{
+            ajaxData = parentParam.ajaxData;
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+            basicObj.status = statusObj;
+        }
+
+        //        $('#cancel').click(function(){
+//            subData('reject',urlData);
+//        });
+        $('#affirm').click(function(){
+            subData('update',urlData);
+        });
+
+        $('#changeOnce').click(function(){
+            subData('changeOnce',urlData)
+        });
+
+        $('#cancel').click(function(){
+            subData('cancel',urlData)
+        });
+
+        $('.item').on('click','input:not(.no_select,#startDate,#endDate)',function(){
+            aL.bgLayout = true;
+            aL.popup = true;
+        });
+
+    });
+</script>
+</html>

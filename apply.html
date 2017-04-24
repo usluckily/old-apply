@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html id="con">
+<head lang="en">
+    <meta name=”renderer” content=”webkit” />
+    <meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+    <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;" />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="css/mobiscroll.css"/>
+    <script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="js/transcoding.js"></script>
+    <script type="text/javascript" src="./js/mobiscroll.js"></script>
+    <title>物品领用</title>
+    <style>
+        .content{margin:0;}
+    </style>
+    <script>
+
+    </script>
+</head>
+<body>
+    <div class="bg_layout" transition="bg-layout" v-show="aL.bgLayout" v-on:click="aL.bgLayout=false,aL.popup=false" v-cloak></div>
+    <div class="popup" transition="popup" v-show="aL.popup">
+        <div class="popup_tit">选择</div>
+        <ul class="popup_con">
+            <li v-for="i in popup.data" v-on:click="setVal($event)" data-id="{{ i.basicdataid || i.equipmentid || i.servicemanid || i.classid || i.deptid }}" v-if="i.equipmentid ? i.equipmenttypeid == popup.eqTypeid : true">{{ i.name || i.classname || i.deptname}}</li>
+        </ul>
+        <div class="popup_exit" v-on:click="aL.bgLayout=false,aL.popup=false"> 取消 </div>
+    </div>
+    <!--popup-->
+
+    <div class="layout">
+        <div class="loader">
+            <div class="loader-inner ball-spin-fade-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <!--loader-->
+
+    <div class="all" style="overflow:auto;" v-cloak>
+
+        <div class="content">
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">班级</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('classtabledata',$event)" id="class"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">部门</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('departmentdata',$event)" id="dept"/>
+                </div>
+
+                <div class="item">
+                    <span class="item_l">申请物品 <a>*</a></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('equipmenttypedata',$event)" id="eqType"/>
+                </div>
+                <!--&-->
+                <div class="item">
+                    <span class="item_l"></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('equipmentdata',$event)" id="eq"/>
+                </div>
+
+                <div class="item">
+                    <span class="item_l">其它物品</span>
+                    <input class="item_r no_select adInput" type="text"  placeholder="请填写" id="otherEq"/>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">库存可借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ popup.availableNumber }}"/>
+                </div>
+                <div class="item" style="padding: 0.5rem 1rem;">
+                    <span class="item_l" style="position: relative; top: 0.4rem;">申请数量 <a>*</a></span>
+                    <div class="item_r num_box">
+                        <span class="add" v-on:click="basic.applyNumber>0? basic.applyNumber-=1 : ''"> </span>
+                        <span class="res" id="applyNum">{{ basic.applyNumber }}</span>
+                        <span class="minus" v-on:click="basic.applyNumber < popup.availableNumber || !popup.availableNumber ? basic.applyNumber+=1 : '' "> </span>
+                    </div>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请原因</span>
+                    <!--<textarea class="item_r" id="applyReason"></textarea>-->
+                    <input class="item_r no_select adInput" id="applyReason"  placeholder="请填写"/>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">领取日期</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" id="startDate"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">归还日期 <a>*</a></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" id="endDate"/>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">是否存在库存</span>
+                    <div class="item_r radio_box" data-status="{{ popup.isExist }}">
+                        <div class="radio" v-bind:class="popup.isExist == '1' ? 'on' : '' ">
+                            <span><a></a></span>
+                            <p>是</p>
+                        </div>
+                        <div class="radio" v-bind:class="popup.isExist == '0' ? 'on' : '' ">
+                            <span><a></a></span>
+                            <p>否</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn" onclick="subData('apply')">提交</div>
+    </div>
+</body>
+<script type="text/javascript" src="./js/main.js"></script>
+<script>
+    var adInput = '';
+    $(function(){
+        var popupData = {data:'',name:'',_thisNode:'',eqTypeid:'',isExist:'',availableNumber:''},
+             aL = {bgLayout:false,popup:false},
+             basicTrans = ['name','classname','deptname'];
+
+        var url = location.href , urlData = {data:''};
+        if(!window.GreenSchool){
+            urlData = pieceFunc.getUrlParam(url);
+        }
+
+        //get param from parent page
+        var parentParam = parent.giveParam();
+        //
+
+        new Vue({
+            el:"#con",
+            data:{
+                basic:basicObj,
+                popup:popupData,
+                aL:aL
+            },
+            methods:{
+                popupFunc: function(type,event){
+                    var _thisNode = event.currentTarget;
+                    if(type == 'equipmentdata'){
+                        this.popup.eqTypeid = $('#eqType').attr('data-id');
+                    }
+//                    alert($('#eqType').attr('data-id'));
+                    this.popup.data = this.basic[type];
+                    this.popup._thisNode = _thisNode;
+//                    alert(JSON.stringify(this.popup));
+                },
+                setVal: function(event){
+                    var text = $(event.currentTarget).text() , id = $(event.currentTarget).attr('data-id');
+                    if($(this.popup._thisNode).attr('id') == 'eqType'){
+                        $('#eq').val('');
+                        $('#eq').removeAttr('data-id');
+                    }else if($(this.popup._thisNode).attr('id') == 'eq'){
+                        var _this = this;
+                        Ajax(isExist,'GET',{equipmentid:id},function(Info){
+                            var itemTotalNumber = JSON.parse(Info).itemTotalNumber;
+                            itemTotalNumber > 0 ? _this.popup.isExist = '1' : _this.popup.isExist = '0';
+                            _this.popup.availableNumber = JSON.parse(Info).availableNumber;
+                        });
+                    }
+                    $(this.popup._thisNode).val(text);
+                    $(this.popup._thisNode).attr('data-id',id);
+                    this.aL.bgLayout = false;
+                    this.aL.popup = false;
+                }
+            }
+        });
+
+        $('.item').on('click','input:not(.no_select,#startDate,#endDate)',function(){
+            aL.bgLayout = true;
+            aL.popup = true;
+        });
+
+        if(window.GreenSchool){
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+            $('.adInput').prop('readyonly','readyonly');
+            $('.adInput').click(function(){
+                adInput = $(this);
+                GreenSchool.inputText($(this).val());
+            });
+        }else{
+            ajaxData = parentParam.ajaxData;
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+        }
+
+
+        //calendar
+        var currYear = (new Date()).getFullYear();
+        $("#startDate").mobiscroll().date({
+            theme: "android-ics light",
+            lang: "zh",
+            cancelText: null,
+            startYear: currYear-5,
+            dateFormat: 'yy-mm-dd', //返回结果格式化为年月格式
+            onSelect: function(inst){
+
+            }
+        });
+        $("#endDate").mobiscroll().date({
+            theme: "android-ics light",
+            lang: "zh",
+            cancelText: null,
+            startYear: currYear-5,
+            dateFormat: 'yy-mm-dd', //返回结果格式化为年月格式
+            onSelect: function(inst){
+
+            }
+        });
+    });
+
+
+    function parentCall(t){
+        adInput.val(t);
+    }
+</script>
+</html>

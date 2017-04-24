@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html id="con">
+<head lang="en">
+    <meta name=”renderer” content=”webkit” />
+    <meta http-equiv=”X-UA-Compatible” content=”IE=Edge,chrome=1″ >
+    <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"  />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="js/transcoding.js"></script>
+    <title>物品领用</title>
+    <style>
+        .content{margin:0;}
+        .layout{display:none;}
+    </style>
+    <script>
+
+    </script>
+</head>
+<body>
+    <div class="bg_layout" transition="bg-layout" v-show="aL.bgLayout" v-on:click="aL.bgLayout=false,aL.popup=false" v-cloak></div>
+    <div class="popup" transition="popup" v-show="aL.popup">
+        <div class="popup_tit">选择</div>
+        <ul class="popup_con">
+            <li v-for="i in popup.data" v-on:click="setVal($event)" data-id="{{ i.basicdataid || i.equipmentid || i.servicemanid || i.classid || i.deptid }}" v-if="i.equipmentid ? i.equipmenttypeid == popup.eqTypeid : true">{{ i.name || i.classname || i.deptname}}</li>
+        </ul>
+        <div class="popup_exit" v-on:click="aL.bgLayout=false,aL.popup=false"> 取消 </div>
+    </div>
+    <!--popup-->
+
+    <div class="layout">
+        <div class="loader">
+            <div class="loader-inner ball-spin-fade-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <!--loader-->
+
+    <div class="all" style="overflow:auto;" v-cloak>
+        <div class="header">
+            <div class="info_box clearfix">
+                <img src="img/logo.png"/>
+                <div>
+                    <p><b>{{ data.data.approveman }}</b> <span class="color_red">{{ data.data.status }}</span></p>
+                    <p>{{ data.data.classname }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content" data-status="{{ data.data.applyforid }}">
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">申请物品 ：</span>
+                    <p class="item_r">{{ data.data.equipmenttypename }} / {{ data.data.equipmentname }}</p>
+                </div>
+                <div class="item">
+                    <span class="item_l">其它物品 ：</span>
+                    <p class="item_r"></p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">库存总数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.itemtotalnumber == 'null' ? ‘未知’: data.data.itemtotalnumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">库存已借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.borrowoutnumber == 'null' ? ‘未知’: data.data.borrowoutnumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">库存可借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.availablenumber == 'null' ? ‘未知’: data.data.availablenumber }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.equipmentnum }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请原因 ：</span>
+                    <p class="item_r">{{ data.data.applyforreason }}</p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">申请日期 ：</span>
+                    <p class="item_r">{{ data.data.gettime }}</p>
+                </div>
+                <div class="item">
+                    <span class="item_l">归还日期 ：</span>
+                    <p class="item_r">{{ data.data.returntime }}</p>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">是否存在库存</span>
+                    <div class="item_r radio_box">
+                        <div class="radio" v-bind:class="data.data.itemtotalnumber > 0 ? 'on' : ''">
+                            <span><a></a></span>
+                            <p>是</p>
+                        </div>
+                        <div class="radio" v-bind:class="data.data.itemtotalnumber <= 0 ? 'on' : ''">
+                            <span><a></a></span>
+                            <p>否</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <span class="item_l">采办人</span>
+                    <input class="item_r" type="text" readonly="" value="{{ data.data.serviceman }}" placeholder="请选择" v-on:click="popupFunc('servicemandata',$event)" id="serviceMan" data-id="{{ data.data.servicemanid }}"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">批注 ：<a>*</a></span>
+                    <input class="item_r no_select" id="postil" placeholder="请填写"/>
+                </div>
+            </div>
+        </div>
+
+        <div style="width:100%;display:flex;">
+            <div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="cancel"  v-if="hasPer('WPQX')">取消申请</div>
+            <div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="reject" v-if="hasPer('WPBH')">驳回申请</div><!--v-if="hasPer('WPBH')"-->
+            <div class="btn_2" style="float:left;margin-left:1%;margin-right:3%;" id="pass" v-if="hasPer('WPTG')">通过申请</div><!--v-if="hasPer('WPTG')"-->
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="./js/main.js"></script>
+<script>
+    $(function(){
+        var url = location.href;
+        var transData = ['repairman','faultdescription','serviceman','approveman','comment','specifiedserviceman','faultname','otherequipment','classname'];
+        var urlData = {data:'',number:''},
+             popupData = {data:'',name:'',_thisNode:'',eqTypeid:'',isExist:''},
+             basicTrans = ['name','classname','deptname'],
+             aL = {bgLayout:false,popup:false};
+        url = url.split('?')[1];
+        url = decodeURI(url);
+        urlData.data = JSON.parse(url);
+
+        //get param from parent page
+        var parentParam = parent.giveParam();
+        //
+
+
+        var applyforid = urlData.data.applyforid;
+//        alert(JSON.stringify(urlData));
+
+        new Vue({
+            el:"#con",
+            data:{
+                data:urlData,
+                popup:popupData,
+                basic:basicObj,
+                aL:aL
+            },
+            methods:{
+                popupFunc: function(type,event){
+                    var _thisNode = event.currentTarget;
+                    if(type == 'equipmentdata'){
+                        this.popup.eqTypeid = $('#eqType').attr('data-id');
+                    }
+//                    alert($('#eqType').attr('data-id'));
+                    this.popup.data = this.basic[type];
+                    this.popup._thisNode = _thisNode;
+//                    alert(JSON.stringify(this.popup));
+                },
+                setVal: function(event){
+                    var text = $(event.currentTarget).text() , id = $(event.currentTarget).attr('data-id');
+                    if($(this.popup._thisNode).attr('id') == 'eqType'){
+                        $('#eq').val('');
+                        $('#eq').removeAttr('data-id');
+                    }else if($(this.popup._thisNode).attr('id') == 'eq'){
+                        var Info = Ajax(isExist,'GET',{equipmentid:id}) , itemTotalNumber = JSON.parse(Info.responseText).itemTotalNumber;
+                        itemTotalNumber > 0 ? this.popup.isExist = '1' : this.popup.isExist = '0';
+                    }
+                    $(this.popup._thisNode).val(text);
+                    $(this.popup._thisNode).attr('data-id',id);
+                    this.aL.bgLayout = false;
+                    this.aL.popup = false;
+                },
+                hasPer: function(per){
+                    if(!window.GreenSchool){
+                        permission = parentParam.permission.split(',');
+                    }
+                    return isInArr(per,permission);
+                }
+            }
+        });
+
+        if(window.GreenSchool){
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+        }else{
+            ajaxData = parentParam.ajaxData;
+            getData(getBasic,'GET',ajaxData,basicTrans,basicObj);
+        }
+
+        $('#reject').click(function(){
+            if($('#postil').val() == ''){
+                $('#postil').focus();
+            }else{
+                subData('reject',urlData);
+            }
+
+        });
+        $('#pass').click(function(){
+            subData('pass',urlData);
+        });
+
+        $('#cancel').click(function(){
+            subData('cancel',urlData);
+        });
+
+        $('.item').on('click','input:not(.no_select,#startDate,#endDate)',function(){
+            aL.bgLayout = true;
+            aL.popup = true;
+        });
+    });
+</script>
+</html>

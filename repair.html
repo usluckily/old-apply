@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html id="myApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>报修</title>
+    <meta name="viewport" content="initial-scale=1, maximu m-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/sm.min.css">
+    <link rel="stylesheet" href="../repairMange/css/sm-extend.min.css">
+    <link rel="stylesheet" href="css/css.css"/>
+    <!--[if !IE]><!--> <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script> <!--<![endif]-->
+    <!--[if IE]>
+    <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="js/transcoding.js"></script>
+    <script type="text/javascript" src="js/vue.min.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<div class="page-group">
+    <div class="modal-ghost">
+        <div class="myModal">
+            <h4>提示</h4>
+            <div class="modal-con">内容内容</div>
+        </div>
+    </div>
+
+    <div class="ghost">
+        <div class="select-box" data-type="{{type}}">
+                <ul>
+                    <li v-for="i in type.Type" v-show="i.placetypeid==type.typeId || i.placeid==undefined"
+                        onclick="selectBoxChoose(this)" placetypeid="{{i.placetypeid}}" placeid="{{i.placeid}}" faultid="{{i.faultid}}" servicemanid="{{i.servicemanid}}" >{{i.name}}</li>
+                </ul>
+        </div>
+    </div>
+
+    <div class="page">
+        <header class="bar bar-nav">
+            <a class="button button-link button-nav pull-left"  data-transition='slide-out'onclick="history.back()">
+            返回
+            </a>
+            <h1 class="title">报修申请</h1>
+        </header>
+
+        <div class="content">
+            <form method="post" action="/index.js" style="position:relative;">
+                <div class="content-list">
+                    <ul>
+                        <li>
+                            <span class="mustFill">报修场地:</span>
+                            <div class="choose">
+                                <input class="readonly " type="text" value="分类1" name="PlaceSort1" readonly data-type="placetypedata" id="placetypedata"/>
+                            </div>
+                            <div class="choose">
+                                <input class="readonly" type="text" value="分类2" name="PlaceSort2" readonly data-type="placedata" id="placedata"/>
+                            </div>
+                        </li>
+                        <li>
+                            <span>详细场地:</span>
+                            <div class="choose">
+                                <!--<input type="text" name="placeDescribe"/>-->
+                                <textarea name="placeDescribe"></textarea>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!--list-->
+
+                <div class="content-list">
+                    <ul>
+                        <li>
+                            <span class="mustFill">故障描述:</span>
+                            <div class="choose">
+                                    <input class="readonly" type="text" value="分类" name="breakSort" readonly data-type="faultdata" id="faultdata"/>
+                            </div>
+                        </li>
+                        <li>
+                            <span>故障详情:</span>
+                            <div class="choose">
+                                <!--<input type="text"  name="breakDescribe"/>-->
+                                <textarea name="breakDescribe"></textarea>
+                            </div>
+                        </li>
+
+                        <li>
+                            <span>维修人:</span>
+                            <div class="choose" >
+                                <input type="text" value="请选择"class="readonly" readonly data-type="servicemandata" name="serviceman" />
+                            </div>
+                            <div class="choose">
+                                <div class="little-btn" onclick="cancelService()">取消维修人</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span>优先级:</span>
+                            <div class="">
+                                <div class="divCheckBox" id="divCheckBox" check="on">
+                                    急:
+                                </div>
+                                <div class="divCheckBox">缓:</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!--list-->
+                <div class="dcl FillBug" ></div>
+                <div class="fixed-footer" style="z-index:9999;">
+                     <input type="button" style="border: none;" class="btn" id="sub-btn" value="提交" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--<script type='text/javascript' src='js/zepto.min.js' charset='utf-8'></script>-->
+<!--<script type="text/javascript" src="js/sm-config.js"></script>-->
+<!--<script type='text/javascript' src='js/sm.min.js' charset='utf-8'></script>-->
+<!--<script type='text/javascript' src='js/sm-extend.min.js' charset='utf-8'></script>-->
+<script type="text/javascript" src="js/public.js"></script>
+
+</body>
+</html>

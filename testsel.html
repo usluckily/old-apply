@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>onunload test</title>
+<meta charset="UTF-8">
+</head>
+<script src="js/jquery-2.1.1.min.js"></script>
+<body>
+    <button onclick="push()">push</button>
+    <button onclick="replace()">replace</button>
+    <button onclick="window.open('./apply.html')">click</button>
+</body>
+<script>
+    function push(){
+        history.pushState('','xxxx','./apply.html');
+    }
+
+    function replace(){
+        history.replaceState(null,'xxx','./apply.html');
+    }
+
+//    document.addEventListener('onpopstate',function(){
+//        alert('hehe');
+//    });
+    window.onpopstate = function(){
+        history.pushState(null,null,document.URL);
+    };
+
+    console.log(history.state)
+</script>
+</html>

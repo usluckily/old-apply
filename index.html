@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html id="myapp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self'">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="css/main.css?V3"/>
+    <link rel="stylesheet" type="text/css" href="css/calendar.css"/>
+    <link rel="stylesheet" type="text/css" href="css/swiper-3.3.1.min.css"/>
+    <script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="js/transcoding.js"></script>
+    <script type="text/javascript" src="js/swiper-3.3.1.jquery.min.js"></script>
+    <script type="text/javascript" src="./js/calendar.js"></script>
+    <title>物品申请</title>
+    <style type="text/css">
+        .ghost{position:fixed;width:100%;height:100%;display:block;z-index: 0;top:0;}
+        .scrBtm{position:absolute;bottom:0;line-height:2rem;width:100%;text-align:center;height:2rem;background:#E2E2E2;color:#333;}
+        /*.layout{display:none;}*/
+    </style>
+    <script>
+        function getUserInfo(s1,s2,s3,s4,s5,s6,s7,s8){
+            ajaxData.userid = s7;
+            ajaxData.sid = s8;
+            ajaxData.roleid = s3;
+            permission = s6;
+            isInArr('CKSYWPSQ',permission.split(',')) ? ajaxData.showAll = '1' : ajaxData.showAll = '0';
+            isInArr('SZWPGLY',permission.split(',')) ? ajaxData.setApplyforServiceman = '1' : ajaxData.setApplyforServiceman = '0';
+//            alert(permission);
+            getData(getList,'GET',ajaxData,transData,data);
+            getData(getBasic,'GET',ajaxData,['name','classname','deptname'],basicObj);
+        }
+    </script>
+</head>
+
+<!--DCB2255080B51B56B4B8F605BD93E1BC-->
+
+<body>
+    <div class="ghost" style="background:#fff;">
+        <div class="scrBtm" v-show="Data.data.length > 19">加载中......</div>
+    </div>
+    <!---->
+
+    <div class="layout">
+        <div class="loader">
+            <div class="loader-inner ball-spin-fade-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    <!--loader-->
+
+    <!--<div class="right-layer">-->
+        <!--<div class="all" v-cloak>-->
+            <!--<div class="header">-->
+                <!--<div class="l" onclick="$('.right-layer').animate({'right':'-100%'})">-->
+                    <!--<img src="img/left.png"/>-->
+                <!--</div>-->
+                <!--物品领用-->
+            <!--</div>-->
+
+            <!--<div class="page">-->
+                <!--<div class="content_box">-->
+                    <!--<div class="card_cont">-->
+                        <!--<div class="tb_l">-->
+                            <!--<div class="icon-box-big bg_h" v-if=" data.data.priority==1 ">急</div>-->
+                            <!--<div class="icon-box-big bg_m" v-if=" data.data.priority==2 ">缓</div>-->
+                        <!--</div>-->
+                        <!--<div class="tb_c">-->
+                            <!--<p>{{ sliderData.data.repairman }}</p>-->
+                            <!--<p>{{ data.data.repairtime }}</p>-->
+                        <!--</div>-->
+                        <!--<div class="tb_r">-->
+                            <!--<p class="status s">{{ data.data.status }}</p>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>报修设备：<span>{{ data.data.equipmentname || data.data.otherequipment}}</span></p>-->
+                    <!--<p>报修场地：<span>{{ data.data.placename || data.data.placeaddress}}</span></p>-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>故障描述：<span>{{ data.data.faultdescription || data.data.faultname}}</span></p>-->
+                    <!--<p><img v-bind:src="data.data.picsummary" id="zoomImg"/></p><!--{{ data.data.picsummary }}-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>维修状态：<span>{{ data.data.status }}</span></p>-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>维修人：<span>{{ data.data.serviceman || data.data.specifiedserviceman}}</span></p>-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>审批人：<span>{{ data.data.approveman }}</span></p>-->
+                <!--</div>-->
+
+                <!--<div class="content_box">-->
+                    <!--<p>批注：<span>{{ data.data.comment }}</span></p>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<iframe style="width:100%;height:100%;border:none;" class="right-layer" ></iframe>-->
+    <!--滑块-->
+
+    <div class="returnTop">
+        顶部
+    </div>
+    <!--returnTop-->
+    <div class="all">
+        <div class="head">
+
+            <div class="nav">
+                <ul id="scr_nav" class="swiper-wrapper tabs" >
+                    <li data-index="1" class="on swiper-slide" id="navCur">待审批</li>
+                    <li data-index="2" class="swiper-slide">已审批</li><!--{{ data.data[0].statusid==con.statusid ? data.number : "X" }}-->
+                    <li data-index="3" class="swiper-slide">可领取</li>
+                    <li data-index="4" class="swiper-slide">已借出</li>
+                    <li data-index="5" class="swiper-slide">待归还</li>
+                    <li data-index="6" class="swiper-slide">已归还</li>
+                    <li data-index="7" class="swiper-slide">已取消</li><!--v-if="hasPer('SZWPGLY')"-->
+                    <li data-index="8" class="swiper-slide">已驳回</li>
+                </ul>
+            </div>
+
+            <div class="date">
+                <div>
+                    <div class="select" id="select_1" data-postid="">选择班级</div>
+                    <ul class="select_box" id="pri">
+                        <li data-id="">全部</li>
+                        <li v-for="i in basic.classtabledata" data-id="{{ i.classid }}">{{ i.classname }}</li>
+                    </ul>
+                    <span class="canlendar-ico"><img src="img/arrows.png"/></span>
+                </div>
+
+                <div id="repairdate">
+                    <input type="text" name="startDate" id="startDate" class="dateInput" readonly  placeholder="所有日期" />
+                    <span class="canlendar-ico"><img src="img/calendar.png"/></span>
+                </div>
+
+                <div>
+                     <div class="select" id="select_2" data-postid="">选择物品</div>
+                    <ul class="select_box" id="placeType">
+                        <li data-id="">全部物品</li>
+                        <li v-for="i in basic.equipmentdata" data-id="{{ i.equipmentid }}" onclick="">{{ i.name }}</li>
+                    </ul>
+                    <!--<select id="placeType">-->
+                    <!--<option value="-1" selected="selected" onclick="configObj.placetypeid='-1';">全部场地</option>-->
+                    <!--<option v-for="i in data.placetypedata" value="{{ i.placetypeid }}" onclick="configObj.placetypeid=this.value;">{{ i.name }}</option>-->
+                    <!--</select>-->
+                    <span class="canlendar-ico"><img src="img/arrows.png"/></span>
+                </div>
+            </div>
+            <!--calendar-->
+        </div>
+
+        <div class="content" v-cloak>
+            <div class="swiper-container" id="tabs-container">
+                <div class="swiper-wrapper">
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <!--<div class="card" v-for="i in 40" style="height:50px;width:100%;">{{ i }}</div>-->
+                            <div class="card" v-for="i in data.data" v-on:click="!xxx ? jump('./approve.html',i) : ''">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--待审批-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--已审批-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--可领取-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--已借出-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--待归还-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h" >{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--已归还-->
+                    <div class="card_box swiper-slide" >
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--已取消-->
+                    <div class="card_box swiper-slide">
+                        <div class="in_card_box">
+                            <div class="card" v-for="i in data.data" v-on:click="jump('./changeStatus.html',i)">
+                                <div class="card_head">
+                                    {{ i.approvetime }}
+                                    <span class="h">{{ i.status }}</span>
+                                </div>
+                                <div class="card_cont">
+                                    <div class="tb_c">
+                                        <p>{{ i.equipmenttypename || '其它'}} / {{ i.equipmentname || i.otherequipment }}</p>
+                                        <p>{{ i.approveman}}</p>
+                                    </div>
+                                    <div class="tb_r"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height:4rem;"></div>
+                    </div>
+                    <!--已驳回-->
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="fixed_footer">
+            <div class="btn" style="position:relative;" v-on:click="jump('./apply.html')">我要申请</div><!--v-on:click="jump('./apply.html')"-->
+            <!--<div class="adInput" style="width:100px;height:40px;border:1px solid #e2e2e2;"></div>-->
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="./js/main.js?V2"></script>
+<script>
+    function inputText(t){
+        myiframe.window.parentCall(t);
+//        adInput.text(t);
+    }
+
+
+    var time = 1000*5;
+    var longPollUrl = '/school/repairManage_listRepair.do?method=checkRepairReadStatus';
+    var longPollData = {sid:'33',status:ajaxData.status};
+    var transData = ['equipmentname','classname','status','equipmenttypename','deptname','serviceman','otherequipment','placetypename','faultname','comment','approveman','repairman','picsummary'];//需要转换编码格式的属性
+    //calendar
+    var mySwiper = new Swiper('.swiper-container',{
+        loop: false,
+        freeMode:false,
+        speed:300,
+        onSlideChangeStart: function(){
+            ajaxData.pageIndexName = 1;
+            ajaxData.status = mySwiper.activeIndex + 1;
+            getData(getList,'GET',ajaxData,transData,data);
+            $('.select_box').fadeOut();
+        },
+        onSlideChangeEnd: function(){
+            navSwiper.slideTo(mySwiper.activeIndex, 300);
+            $('.nav').find('li').removeAttr('id').eq(mySwiper.activeIndex).attr('id','navCur');
+        }
+    });
+
+    var navSwiper = new Swiper(".nav",{
+        freeMode : true,
+        slidesPerView : 'auto'
+    });
+
+    var nodeInit = new nodeInit();
+    $(function(){
+        nodeInit.card();
+        nodeInit.calendar();
+//        NS.start();
+        ////ajax
+//        getData(getUrl,'GET',ajaxData,transData);
+//        getData(getList,'GET',{userid:'909191535',sid:'33'},transData,data);
+        if(window.GreenSchool){
+            getData(getList,'GET',ajaxData,transData,data);
+//            getData(getApplyForCount,'GET',ajaxData,transData,statusNum);
+            getData(getBasic,'GET',ajaxData,['name','classname','deptname'],basicObj);
+            $('.adInput').click(function(){
+                adInput = $(this);
+                GreenSchool.inputText();
+            });
+        }
+
+        //pc
+        if(!window.GreenSchool && !navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//&& navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)
+            getData(getList,'GET',ajaxData,transData,data);
+            getData(getBasic,'GET',ajaxData,['name','classname','deptname'],basicObj);
+        }
+
+        scrollLoad.start($('.card_box'));
+    });
+
+    $('.nav ul li').click(function(){
+        var index = $(this).index();
+        $(this).attr('id','navCur').siblings().removeAttr('id');
+        console.log();
+        mySwiper.slideTo(index, 300);
+
+        configObj.statusid = ajaxData.status = $(this).attr('data-index');
+
+        if(ajaxData.status == undefined){
+            ajaxData.status = $(this).index() + 1;
+        }
+
+        getData(getList,'GET',ajaxData,transData,data);
+
+        ///头部点击时的DOM变化
+        $('.nav ul li>span').remove();
+        $('#startDate').val('');
+        var text = $('#placeType>li').eq(0).text();
+        var text2 = $('#place>li').eq(0).text();
+        $('#placeType').siblings('.select').text(text);
+        $('#placeType').siblings('.select').attr('data-postid','');
+        $('#place').siblings('.select').text(text2);
+        $('#place').siblings('.select').attr('data-postid','');
+
+//        setNum(this);
+        ////
+    });
+
+    $('.returnTop').click(function(){
+        $('.all').scrollTop(0);
+    });
+
+    $(window).resize(function(){
+        nodeInit.card();
+    });
+
+    function giveParam(){
+        var result = {ajaxData:'',permission:'',pageIndex:mySwiper.activeIndex,changeStatus:mySwiper.activeIndex,btnName:''};
+        result.changeStatus +=2;
+        result.ajaxData = ajaxData;
+        result.permission = permission;
+        return result;
+    }
+
+   function applyCallParent(){
+       if( ajaxData.status == '1' ){
+           getData(getList,'GET',ajaxData,transData,data);
+       }
+   }
+
+   function changeCallParent(){
+       getData(getList,'GET',ajaxData,transData,data);
+   }
+
+</script>
+<script type="text/javascript" src="js/scrollLoad.js"></script>
+</html>
