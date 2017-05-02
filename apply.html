@@ -20,15 +20,6 @@
     </script>
 </head>
 <body>
-    <div class="bg_layout" transition="bg-layout" v-show="aL.bgLayout" v-on:click="aL.bgLayout=false,aL.popup=false" v-cloak></div>
-    <div class="popup" transition="popup" v-show="aL.popup">
-        <div class="popup_tit">选择</div>
-        <ul class="popup_con">
-            <li v-for="i in popup.data" v-on:click="setVal($event)" data-id="{{ i.basicdataid || i.equipmentid || i.servicemanid || i.classid || i.deptid }}" v-if="i.equipmentid ? i.equipmenttypeid == popup.eqTypeid : true">{{ i.name || i.classname || i.deptname}}</li>
-        </ul>
-        <div class="popup_exit" v-on:click="aL.bgLayout=false,aL.popup=false"> 取消 </div>
-    </div>
-    <!--popup-->
 
     <div class="layout">
         <div class="loader">
@@ -46,9 +37,19 @@
     </div>
     <!--loader-->
 
-    <div class="all" style="overflow:auto;" v-cloak>
+    <div class="all"  v-cloak>
+        <div class="bg_layout" transition="bg-layout" v-show="aL.bgLayout" v-on:click="aL.bgLayout=false,aL.popup=false" v-cloak></div>
+        <div class="popup" transition="popup" v-show="aL.popup">
+            <div class="popup_tit">选择</div>
+            <ul class="popup_con">
+                <li v-for="i in popup.data" v-on:click="setVal($event)" data-id="{{ i.basicdataid || i.equipmentid || i.servicemanid || i.classid || i.deptid }}" v-if="i.equipmentid ? i.equipmenttypeid == popup.eqTypeid : true">{{ i.name || i.classname || i.deptname}}</li>
+            </ul>
+            <div class="popup_exit" v-on:click="aL.bgLayout=false,aL.popup=false"> 取消 </div>
+        </div>
+        <!--popup-->
 
-        <div class="content">
+
+        <div class="content" style="overflow:auto;height:100%;">
             <div class="con_box">
                 <div class="item">
                     <span class="item_l">班级</span>

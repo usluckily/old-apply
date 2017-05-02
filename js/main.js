@@ -115,7 +115,7 @@ function subData(type,urlobj){
                 sid:sid,
                 userid:ajaxData.userid,
                 auth:auth,
-                applyforclassid:userid,
+                applyforclassid:applyforclassid,
                 dempid:dempid,
                 equipmenttypeid:equipmenttypeid,
                 equipmentid:equipmentid,
@@ -204,6 +204,31 @@ function subData(type,urlobj){
                 parent.changeCallParent();
             });
             break;
+        case 'updateApply':
+            var search = location.search.split('?')[1];
+            console.log(search);
+            search = JSON.parse(decodeURI(search));
+            var update = {
+                sid:sid,
+                userid:ajaxData.userid,
+                auth:auth,
+                applyforclassid:userid,
+                dempid:dempid,
+                equipmenttypeid:equipmenttypeid,
+                equipmentid:equipmentid || '',
+                otherequipment:otherequipment,
+                equipmentnum:equipmentnum,
+                applyforreason:applyforreason,
+                pagegettime:pagegettime,
+                pagereturntime:pagereturntime,
+                isexistinventory:isexistinventory,
+                applyforid:search.applyforid
+            };
+            Ajax(updateApply,'POST',update,function(d){
+                history.back();
+//                parent.changeCallParent();
+            });
+            break;
         case 'changeOnce':
             var update = {
                 sid:sid,
@@ -215,6 +240,7 @@ function subData(type,urlobj){
             };
             Ajax(updateApply,'POST',update,function(d){
                 history.back();
+                parent.changeCallParent();
             });
             break;
         default :

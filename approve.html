@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"  />
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="css/mobiscroll.css"/>
     <script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="./js/vue.min.js"></script>
     <script type="text/javascript" src="js/transcoding.js"></script>
+    <script type="text/javascript" src="./js/mobiscroll.js"></script>
     <title>物品领用</title>
     <style>
         .content{margin:0;}
@@ -45,6 +47,93 @@
     </div>
     <!--loader-->
 
+    <div style="width:100%;height:100%;border:none;overflow:auto;" class="right-layer all" >
+        <div class="content">
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">班级</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('classtabledata',$event)" id="class" />
+                </div>
+                <div class="item">
+                    <span class="item_l">部门</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('departmentdata',$event)" id="dept" />
+                </div>
+
+                <div class="item">
+                    <span class="item_l">申请物品 <a>*</a></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('equipmenttypedata',$event)" id="eqType" />
+                </div>
+                <!--&-->
+                <div class="item">
+                    <span class="item_l"></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" v-on:click="popupFunc('equipmentdata',$event)" id="eq" />
+                </div>
+
+                <div class="item">
+                    <span class="item_l">其它物品</span>
+                    <input class="item_r no_select adInput" type="text"  placeholder="请填写" id="otherEq" />
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">库存可借数量</span>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ popup.availableNumber }}"/>
+                </div>
+                <div class="item" style="padding: 0.5rem 1rem;">
+                    <span class="item_l" style="position: relative; top: 0.4rem;">申请数量 <a>*</a></span>
+                    <div class="item_r num_box">
+                        <span class="add" v-on:click="basic.applyNumber>0? basic.applyNumber-=1 : ''"> </span>
+                        <span class="res" id="applyNum">{{ basic.applyNumber }}</span>
+                        <span class="minus" v-on:click="basic.applyNumber < popup.availableNumber || !popup.availableNumber ? basic.applyNumber+=1 : '' "> </span>
+                    </div>
+                </div>
+                <div class="item">
+                    <span class="item_l">申请原因</span>
+                    <!--<textarea class="item_r" id="applyReason"></textarea>-->
+                    <input class="item_r no_select adInput" id="applyReason"  placeholder="请填写" />
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">领取日期</span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" id="startDate"/>
+                </div>
+                <div class="item">
+                    <span class="item_l">归还日期 <a>*</a></span>
+                    <input class="item_r" type="text" readonly="" placeholder="请选择" id="endDate"/>
+                </div>
+            </div>
+            <!---->
+
+            <div class="con_box">
+                <div class="item">
+                    <span class="item_l">是否存在库存</span>
+                    <div class="item_r radio_box" data-status="{{ popup.isExist }}">
+                        <div class="radio" v-bind:class="popup.isExist == '1' ? 'on' : '' ">
+                            <span><a></a></span>
+                            <p>是</p>
+                        </div>
+                        <div class="radio" v-bind:class="popup.isExist == '0' ? 'on' : '' ">
+                            <span><a></a></span>
+                            <p>否</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn_box" style="width:100%;display:flex">
+            <div class="btn_2" onclick="$('.right-layer').animate({'right':'-100%'})">取消</div>
+            <div class="btn_2" onclick="subData('updateApply')">确认更新</div>
+        </div>
+    </div>
+    <!--slider-layout-->
+
+
     <div class="all" style="overflow:auto;" v-cloak>
         <div class="header">
             <div class="info_box clearfix">
@@ -60,27 +149,27 @@
             <div class="con_box">
                 <div class="item">
                     <span class="item_l">申请物品 ：</span>
-                    <p class="item_r">{{ data.data.equipmenttypename }} / {{ data.data.equipmentname }}</p>
+                    <p class="item_r">{{ data.data.equipmenttypename ? data.data.equipmenttypename : '其它' }} / {{ data.data.equipmentname }}</p>
                 </div>
-                <div class="item">
-                    <span class="item_l">其它物品 ：</span>
-                    <p class="item_r"></p>
-                </div>
+                <!--<div class="item">-->
+                    <!--<span class="item_l">其它物品 ：</span>-->
+                    <!--<p class="item_r">{{  }}</p>-->
+                <!--</div>-->
             </div>
             <!---->
 
             <div class="con_box">
                 <div class="item">
                     <span class="item_l">库存总数量</span>
-                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.itemtotalnumber == 'null' ? ‘未知’: data.data.itemtotalnumber }}"/>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.itemtotalnumber == 'null' ? '无该信息' : data.data.itemtotalnumber }}"/>
                 </div>
                 <div class="item">
                     <span class="item_l">库存已借数量</span>
-                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.borrowoutnumber == 'null' ? ‘未知’: data.data.borrowoutnumber }}"/>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.borrowoutnumber == 'null' ? '无该信息' : data.data.borrowoutnumber }}"/>
                 </div>
                 <div class="item">
                     <span class="item_l">库存可借数量</span>
-                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.availablenumber == 'null' ? ‘未知’: data.data.availablenumber }}"/>
+                    <input class="item_r no_select" type="text" readonly="" value="{{ data.data.availablenumber == 'null' ? '无该信息': data.data.availablenumber }}"/>
                 </div>
                 <div class="item">
                     <span class="item_l">申请数量</span>
@@ -96,11 +185,11 @@
             <div class="con_box">
                 <div class="item">
                     <span class="item_l">申请日期 ：</span>
-                    <p class="item_r">{{ data.data.gettime }}</p>
+                    <p class="item_r">{{ data.data.gettime | splitTime }}</p>
                 </div>
                 <div class="item">
                     <span class="item_l">归还日期 ：</span>
-                    <p class="item_r">{{ data.data.returntime }}</p>
+                    <p class="item_r">{{ data.data.returntime | splitTime}}</p>
                 </div>
             </div>
             <!---->
@@ -134,6 +223,7 @@
             <div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="cancel"  v-if="hasPer('WPQX')">取消申请</div>
             <div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="reject" v-if="hasPer('WPBH')">驳回申请</div><!--v-if="hasPer('WPBH')"-->
             <div class="btn_2" style="float:left;margin-left:1%;margin-right:3%;" id="pass" v-if="hasPer('WPTG')">通过申请</div><!--v-if="hasPer('WPTG')"-->
+            <div class="btn_2" v-if="hasPer('WPTG')" onclick="$('.right-layer').animate({'right':'0'})">更新</div>
         </div>
     </div>
 </body>
@@ -143,7 +233,7 @@
         var url = location.href;
         var transData = ['repairman','faultdescription','serviceman','approveman','comment','specifiedserviceman','faultname','otherequipment','classname'];
         var urlData = {data:'',number:''},
-             popupData = {data:'',name:'',_thisNode:'',eqTypeid:'',isExist:''},
+             popupData = {data:'',name:'',_thisNode:'',eqTypeid:'',isExist:'',availableNumber:''},
              basicTrans = ['name','classname','deptname'],
              aL = {bgLayout:false,popup:false};
         url = url.split('?')[1];
@@ -183,8 +273,12 @@
                         $('#eq').val('');
                         $('#eq').removeAttr('data-id');
                     }else if($(this.popup._thisNode).attr('id') == 'eq'){
-                        var Info = Ajax(isExist,'GET',{equipmentid:id}) , itemTotalNumber = JSON.parse(Info.responseText).itemTotalNumber;
-                        itemTotalNumber > 0 ? this.popup.isExist = '1' : this.popup.isExist = '0';
+                        var _this = this;
+                        Ajax(isExist,'GET',{equipmentid:id},function(Info){
+                            var itemTotalNumber = JSON.parse(Info).itemTotalNumber;
+                            itemTotalNumber > 0 ? _this.popup.isExist = '1' : _this.popup.isExist = '0';
+                            _this.popup.availableNumber = JSON.parse(Info).availableNumber;
+                        });
                     }
                     $(this.popup._thisNode).val(text);
                     $(this.popup._thisNode).attr('data-id',id);
@@ -197,7 +291,13 @@
                     }
                     return isInArr(per,permission);
                 }
+            },
+            filters:{
+                splitTime:function(value){
+                    return value.split(' ')[0]
+                }
             }
+
         });
 
         if(window.GreenSchool){
@@ -227,6 +327,31 @@
             aL.bgLayout = true;
             aL.popup = true;
         });
+
+
+        //calendar
+        var currYear = (new Date()).getFullYear();
+        $("#startDate").mobiscroll().date({
+            theme: "android-ics light",
+            lang: "zh",
+            cancelText: null,
+            startYear: currYear-5,
+            dateFormat: 'yy-mm-dd', //返回结果格式化为年月格式
+            onSelect: function(inst){
+
+            }
+        });
+        $("#endDate").mobiscroll().date({
+            theme: "android-ics light",
+            lang: "zh",
+            cancelText: null,
+            startYear: currYear-5,
+            dateFormat: 'yy-mm-dd', //返回结果格式化为年月格式
+            onSelect: function(inst){
+
+            }
+        });
+
     });
 </script>
 </html>

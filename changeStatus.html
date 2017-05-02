@@ -146,7 +146,7 @@
 
         <!--<div class="btn_2" style="float:left;margin-left:3%;margin-right:1%;" id="cancel"  onclick="" v-if="hasPer('WPQX') && !hasPer('CKSYWPSQ')">取消申请</div>-->
         <!--<div class="btn" style="float:left;margin-left:1%;margin-right:3%;" id="affirm" v-if="hasPer('CKSYWPSQ')">确定更改状态</div>&lt;!&ndash;v-if="hasPer('WPXG')"&ndash;&gt; &lt;!&ndash; v-if="hasPer('CKSYWPSQ')" &ndash;&gt;-->
-        <div class="btn" data-status="{{parent.changeStatus | changeStatus}}" id="changeOnce" v-if=" parent.pageIndex != 5 && hasPer('WPYJC') && !hasPer('CKSYWPSQ')" >{{ parent.pageIndex | btnName }}</div>
+        <div class="btn" data-status="{{parent.changeStatus | changeStatus}}" id="changeOnce" v-if=" parent.pageIndex != 5 && hasPer('WPYJC')" >{{ parent.pageIndex | btnName }}</div>
 
     </div>
 </body>
@@ -220,7 +220,7 @@
                             res = '已借出';
                             break;
                         case 3:
-                            res = '待归还';
+                            res = '归还';
                             break;
                         case 4:
                             res = '已归还';
